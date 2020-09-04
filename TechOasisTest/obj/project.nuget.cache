@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "4XjK4v4r1F1vL/3oGVHQ22Fostii3vUMtid7Q+z7rG8HqmV5G3bdaYjWCsXW4V/xr4LcN8Jb+OxheUpOZqOH/g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Tapiwa Tachiona\\source\\repos\\TechOasisTest\\TechOasisTest\\TechOasisTest.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Tapiwa Tachiona\\.nuget\\packages\\system.componentmodel.annotations\\4.7.0\\system.componentmodel.annotations.4.7.0.nupkg.sha512",
+    "C:\\Users\\Tapiwa Tachiona\\.nuget\\packages\\system.net.http.json\\3.2.0\\system.net.http.json.3.2.0.nupkg.sha512",
+    "C:\\Users\\Tapiwa Tachiona\\.nuget\\packages\\system.text.json\\4.7.1\\system.text.json.4.7.1.nupkg.sha512"
+  ],
+  "logs": []
+}

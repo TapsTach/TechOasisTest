@@ -1,0 +1,226 @@
+﻿@page "/"
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@inject HttpClient Client
+
+<div id="page">
+    <div class="container-wrap position-relative vh-100">
+        <aside id="aside" role="complementary" class="border" style="height: calc(100vh - 70px)">
+            <div class="text-center">
+                <div class="author-img" style="background-image: url(@profile.ImageFilePath);"></div>
+                <h1><a></a>  @profile.FirstName @profile.Surname</h1>
+                <span class="position">Software Developer</span>
+            </div>
+            <div class="profile-contact">
+                <div>
+                    <a><i class="fa fa-globe"> </i>  https://www.@(profile?.ContactDetails?.WebSite)</a>
+                </div>
+                <div>
+                    <a><i class="fa fa-mail-bulk"></i>  @profile?.ContactDetails?.Email</a>
+                </div>
+                <div>
+                    <a><i class="fa fa-phone"></i>  @profile?.ContactDetails?.Phone</a>
+                </div>
+            </div>
+
+            <div class="profile-buttons my-4 d-flex justify-content-center">
+                <a href="https://www.@(profile?.ContactDetails?.WebSite)" class="btn btn-dark btn-sm mx-2"> <i class="fa fa-globe"></i>  Visit Website </a>
+                <a href="#" @onclick="RequestCV" disabled="@profile.CVRequested" class="btn btn-dark btn-sm mx-2"> <i class="fa fa-upload"></i>  Request CV </a>
+            </div>
+        </aside>
+
+        <div id="main" style="overflow-y:auto; max-height:calc(100vh - 70px)">
+            <section class="about" data-section="about">
+                <div class="narrow-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row row-bottom-padded-sm animate-box" data-animate-effect="fadeInLeft">
+                                <div class="col-md-12">
+                                    <div class="about-desc">
+                                        <span class="heading-meta">
+                                            About <span class="text-black-50">@profile.FirstName @profile.Surname </span>
+                                        </span>
+                                        <h2 class="heading">Who Am I?</h2>
+                                        <p><strong>Hi I'm @profile.FirstName @profile.Surname</strong> @((MarkupString) profile.About?.Replace("\n","<br/>")).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- end:main -->
+
+        <div id="navigator" class="d-flex align-items-center justify-content-center">
+
+            <div class="row w-100 align-items-center">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info" id="style-2_info" role="status" aria-live="polite">@pageProfiles.Count item(s) found @((MarkupString)(!string.IsNullOrEmpty(text ) ? $"for term <span class='text-info fontweight-semibold'>{text}</span>":""))</div>
+                </div>
+
+                <div class="col-sm-12 col-md-7">
+                    <div class="d-flex align-items-center ">
+                        <input class="form-control rounded mr-3" @bind="SearchText" @bind:event="oninput" placeholder="Filter" style="max-width:250px" />
+                        <ul class="pagination modal-2 d-inline">
+                            <li class="prev">
+                                <a @onclick="GoToFirstPage">
+                                    <i class="fas fa-angle-double-left" />
+                                </a>
+                            </li>
+                            <li class="mr-2 @(!canGoBack?"disabled":"")">
+                                <a class="prev ">
+                                    <i class="fas fa-angle-left" @onclick="PreviousPages" />
+                                </a>
+                            </li>
+
+
+                            @if (pageProfiles?.Items != null)
+                            {
+                                foreach (var item in pageProfiles.Items)
+                                {
+                                    var currentPage = pageProfiles.Items.IndexOf(item) + 1;
+                                    <li>
+                                        <a class="@(currentProfilePage -((page - 1) * pageSize) == currentPage ? "active" : "")" @onclick="() => OpenPage(currentPage)">@(currentPage + (page - 1) * pageSize)</a>
+                                    </li>
+                                }
+                            }
+                            <li class="next @(!canGoForward ? "disabled":"")">
+                                <a @onclick="NextPages">
+                                    <i class="fas fa-angle-right" />
+                                </a>
+                            </li>
+                            <li class="next">
+                                <a @onclick="GoToLastPage">
+                                    <i class="fas fa-angle-double-right" />
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- end:container-wrap -->
+</div><!-- end:page -->
+
+
+<div class="modal fade @(showRequestCVConf ? "show":"")" id="requestCVConfModal" tabindex="-1" role="dialog" aria-labelledby="requestCVConfModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" @onclick="()=> showRequestCVConf = false" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                CV requested successfully!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="()=> showRequestCVConf = false">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+
+    bool showRequestCVConf;
+    bool canGoForward => currentProfilePage < pageProfiles.Count;
+    bool canGoBack => currentProfilePage > 1;
+    int currentProfilePage = 1;
+
+    SearchModel<TechOasisTest.Shared.Entities.JobSeekerProfile> pageProfiles = new Shared.DTO.SearchModel<Shared.Entities.JobSeekerProfile>();
+    int pageSize = 5;
+    int page = 1;
+
+    async Task PreviousPages()
+    {
+        page--;
+        await LoadPageProfiles();
+        await OpenProfile(pageProfiles.Items.FirstOrDefault());
+    }
+
+    async Task GoToFirstPage()
+    {
+        page = 1;
+        await LoadPageProfiles();
+
+        await OpenProfile(pageProfiles.Items.FirstOrDefault());
+
+    }
+
+    async Task OpenPage(int pageNumber)
+    {
+        var profile = pageProfiles.Items[pageNumber - 1];
+        await OpenProfile(profile);
+    }
+
+    async Task OpenProfile(JobSeekerProfile profile)
+    {
+        if (profile == null) return;
+        this.profile = profile;
+        currentProfilePage = pageProfiles.Items.IndexOf(profile) + 1 + ((page - 1) * pageSize);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task LoadPageProfiles()
+    {
+        var url = Configuration["ApiUrl"] + $"profile/SearchProfiles?page={page}{(text != null ? $"&token={text}" : "")}&pageSize={pageSize}";
+        pageProfiles = await Client.GetFromJsonAsync<SearchModel<JobSeekerProfile>>(url);
+    }
+    async Task GoToLastPage()
+    {
+        page = (int)Math.Ceiling((double)pageProfiles.Count / pageSize);
+        await LoadPageProfiles();
+        await OpenProfile(pageProfiles.Items.FirstOrDefault());
+    }
+    async Task NextPages()
+    {
+        page++;
+        await LoadPageProfiles();
+        await OpenProfile(pageProfiles.Items.FirstOrDefault());
+
+    }
+
+
+    TechOasisTest.Shared.Entities.JobSeekerProfile profile = new Shared.Entities.JobSeekerProfile();
+    protected async override Task OnInitializedAsync()
+    {
+        timer.Interval = 700;
+        timer.Elapsed += async (a, b) =>
+        {
+            timer.Stop();
+            await GoToFirstPage();
+            await InvokeAsync(StateHasChanged);
+        };
+        await GoToFirstPage();
+        await base.OnInitializedAsync();
+    }
+
+    string text;
+    string SearchText
+    {
+        get => text;
+        set
+        {
+            if (text != value)
+            {
+                text = value;
+                DebounceSearch(text);
+            }
+        }
+    }
+
+    System.Timers.Timer timer = new System.Timers.Timer();
+    void DebounceSearch(string token)
+    {
+        timer.Stop();
+        timer.Start();
+    }
+    async Task RequestCV()
+    {
+        var url = Configuration["ApiUrl"] + "profile/RequestCV";
+        var result = await Client.GetFromJsonAsync<bool>
+            (url);
+    }
+
+}

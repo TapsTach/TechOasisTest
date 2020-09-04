@@ -1,0 +1,9 @@
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\bin\Debug\netstandard2.0\TechOasisTest.Shared.deps.json
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\bin\Debug\netstandard2.0\TechOasisTest.Shared.dll
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.csprojAssemblyReference.cache
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.AssemblyInfoInputs.cache
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.AssemblyInfo.cs
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\bin\Debug\netstandard2.0\TechOasisTest.Shared.pdb
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.dll
+C:\Users\Tapiwa Tachiona\source\repos\TechOasisTest\TechOasisTest.Shared\obj\Debug\netstandard2.0\TechOasisTest.Shared.pdb
